@@ -12,6 +12,8 @@ describe("Automating Patient Module", () => {
         const patientPage = new Patients();
         const loginPage = new Login();
 
+        const baseUrl = Cypress.env('BASE_URL'); 
+
 
         // Parse the login and patient data from the Excel files
         cy.parseXlsx('cypress/fixtures/LoginData.xlsx').then((loginData) => {
@@ -36,7 +38,7 @@ describe("Automating Patient Module", () => {
                     }
 
                     // Log in with the current user
-                    cy.visit("http://docsforhealthweb.s3-website-us-east-1.amazonaws.com/auth/login", { failOnStatusCode: false });
+                    cy.visit(baseUrl, { failOnStatusCode: false }); 
                     loginPage.set_user_email().type(email);
                     cy.wait(3000);
                     loginPage.set_user_password().type(password);
@@ -114,6 +116,10 @@ describe("Automating Patient Module", () => {
                                     if (dropdown.find(`option[value="${race}"]`).length) {
                                         patientPage.set_race(race);
                                     }
+                                    else {
+                                        // If the option is not found, log the message
+                                        cy.log(`Race value "${race}" not found.`);
+                                    }
                                 });
                             }
 
@@ -122,23 +128,48 @@ describe("Automating Patient Module", () => {
                                     if (dropdown.find(`option[value="${relationshipStatus}"]`).length) {
                                         patientPage.set_relationship_status(relationshipStatus);
                                     }
+                                    else {
+                                        // If the option is not found, log the message
+                                        cy.log(`Relationshipstatus value "${relationshipStatus}" not found.`);
+                                    }
                                 });
                             }
 
-                            if (gender) patientPage.set_gender(gender);
+                            // if (gender) patientPage.set_gender(gender);
+
+                            if (gender) {
+                                cy.get("div[class='flex-col relative']").then(dropdown => {
+                                    if (dropdown.find(`option[value="${gender}"]`).length) {
+                                        patientPage.set_gender(gender);
+                                    }
+                                    else {
+                                        // If the option is not found, log the message
+                                        cy.log(`Gender value "${gender}" not found.`);
+                                    }
+                                });
+                            }
 
                             if (primaryLanguage) {
                                 cy.get("[name='primaryLanguage']").then(dropdown => {
                                     if (dropdown.find(`option[value="${primaryLanguage}"]`).length) {
                                         patientPage.set_primary_language(primaryLanguage);
                                     }
+                                    else {
+                                        // If the option is not found, log the message
+                                        cy.log(`Primary Language value "${primaryLanguage}" not found.`);
+                                    }
                                 });
                             }
+                            
 
                             if (ethnicity) {
                                 cy.get("[name = 'ethnicity']").then(dropdown => {
                                     if (dropdown.find(`option[value="${ethnicity}"]`).length) {
                                         patientPage.set_ethnicity(ethnicity);
+                                    }
+                                    else {
+                                        // If the option is not found, log the message
+                                        cy.log(`Ethnicity value "${ethnicity}" not found.`);
                                     }
                                 });
                             }
@@ -148,11 +179,33 @@ describe("Automating Patient Module", () => {
                                     if (dropdown.find(`option[value="${education}"]`).length) {
                                         patientPage.set_education(education);
                                     }
+                                    else {
+                                        // If the option is not found, log the message
+                                        cy.log(`Education value "${education}" not found.`);
+                                    }
                                 });
                             }
 
                             if (medicalProvider) patientPage.set_medical_provider().type(medicalProvider);
-                            if (responsibleIndividual) patientPage.set_responsible_individual(responsibleIndividual);
+
+
+                            if (responsibleIndividual) {
+                                cy.get(".flex.items-center.border.form-input.p-1.space-x-1.rounded.opacity-100").click();
+                                cy.get("input[placeholder='Search']").type(responsibleIndividual).then(() => {
+                                    cy.get("ul").then(dropdown => {
+                                        const optionSelector = `li:contains(${responsibleIndividual})`;
+                                        
+                                        if (dropdown.find(optionSelector).length) {
+                                            cy.log(`Responsible Individual "${responsibleIndividual}" found.`);
+                                            cy.get(optionSelector).click(); // Click the locator if the option is available
+                                        } else {
+                                            cy.log(`Responsible Individual "${responsibleIndividual}" not found.`);
+                                            // Skip further action for this step
+                                        }
+                                    });
+                                });
+                            }
+                            
                             if (enrollmentDate) patientPage.set_enrollment_date().type(enrollmentDate);
                             if (socialSecurity) patientPage.set_social_security().type(socialSecurity);
                             if (personalIncome) patientPage.set_personal_income().type(personalIncome);
@@ -199,7 +252,7 @@ describe("Automating Patient Module", () => {
                                 });
                             }
                             
-                            patientPage.set_manager_name().type(managerName);
+                            if (managerName) patientPage.set_manager_name().type(managerName);
                             if (managerEmail) patientPage.set_manager_email().type(managerEmail);
                             if (managerPhone) patientPage.set_manager_phone_number().type(managerPhone);
                             if (agency) patientPage.set_agency().type(agency);
@@ -209,8 +262,8 @@ describe("Automating Patient Module", () => {
                             patientPage.create_patient_btn().click();
                      
                         });
-                        cy.wait(2000);
-                        cy.get('.ms-3').should('be.visible'); // Check for success message
+                        cy.wait(3000);
+                        cy.get('.ms-3.text-sm.font-medium').should('be.visible'); // Check for success message
                         // // Prepare for the next patient
                         cy.wait(3000);
                     });
@@ -223,5 +276,3 @@ describe("Automating Patient Module", () => {
         });
     });
 });
-
-

@@ -27,8 +27,8 @@ class Login{
 
     set_logout()
     {
-        cy.get("[fill ='currentColor']").click({multiple: true});
-        cy.get("#user-menu-item-2").click({multiple: true});
+        cy.get('#options-menu').click({multiple: true});
+        cy.get('#user-menu-item-2').click({multiple: true});
     }
 
     

@@ -139,7 +139,9 @@ class Patients{
         });
         
     }
-
+    
+    
+    
     set_ethnicity(dropdownValue)
     {
 
@@ -164,11 +166,12 @@ class Patients{
         return cy.get(this.Medical_Provider_Locator)
     }
 
-    set_responsible_individual(responsibleIndividual)
+    set_responsible_individual(ResponsibleIndividual)
     {
-        cy.get(this.Responsible_Individual_Locator).click()
-        cy.get("input[placeholder='Search']").type(responsibleIndividual)
-        cy.get(".absolute.bg-white.border.p-2.w-full.border-t-0.rounded-b.z-50").click()
+        cy.get(this.Responsible_Individual_Locator).click();
+        cy.get("input[placeholder='Search']").type(ResponsibleIndividual);
+        cy.get("li[class='flex items-center justify-between py-1 cursor-pointer hover:bg-[#F1F5F9]']").click();
+        
     }
 
     set_enrollment_date()

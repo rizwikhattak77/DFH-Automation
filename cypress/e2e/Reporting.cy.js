@@ -10,6 +10,8 @@ describe("Automating Reporting Module", () => {
         const loginpage = new Login();
         const reportingpage = new Reporting();
 
+        const baseUrl = Cypress.env('BASE_URL'); 
+
         // Parse the Reporting Excel file
         cy.parseXlsx('cypress/fixtures/ReportingData.xlsx').then((excelData) => {
             const rowCount = excelData[0].data.length;
@@ -26,7 +28,7 @@ describe("Automating Reporting Module", () => {
                 const optionsToSelect = rowData.slice(2, 10); // Get options as an array of booleans for checkboxes
 
                 if (email && password) {
-                    cy.visit("http://docsforhealthweb.s3-website-us-east-1.amazonaws.com/auth/login", { failOnStatusCode: false });
+                    cy.visit(baseUrl, { failOnStatusCode: false });
 
                     // Perform login action
                     loginpage.set_user_email().type(email);
